@@ -1,0 +1,209 @@
+/* General Container */
+.container {
+    margin: 0 auto;
+    max-width: 1200px;
+    padding: 20px;
+    background-color: #f7f9fc;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* Message Box */
+  .message-box {
+    background-color: #ffefcc;
+    padding: 15px;
+    border-left: 5px solid #ffbb33;
+    margin: 15px 0;
+    border-radius: 5px;
+  }
+  
+  /* Button Styles */
+  button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+  
+  button:disabled {
+    background-color: #6c757d;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Text Input and Text Area */
+  input[type="text"], input[type="date"], textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #fff;
+  }
+  
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+  
+  select {
+    appearance: none;
+  }
+  
+  /* Label Styles */
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+  
+  /* Task Details Section */
+  .task-details h1 {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .task-details p {
+    font-size: 16px;
+    margin: 8px 0;
+  }
+  
+  .task-details strong {
+    color: #333;
+  }
+  
+  .edit-button {
+    background-color: #28a745;
+    margin-right: 10px;
+  }
+  
+  .update-button, .save-button {
+    background-color: #17a2b8;
+  }
+  
+  .cancel-button, .delete-button {
+    background-color: #dc3545;
+  }
+  
+  /* Task Links Section */
+  .task-links a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .task-links a:hover {
+    text-decoration: underline;
+  }
+  
+  /* AI Assistance Section */
+  .ai-assistance {
+    background-color: #f0f4f7;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+  }
+  
+  .ai-generate-prompt-button, .ai-custom-prompt-button {
+    background-color: #007bff;
+    margin-right: 10px;
+  }
+  
+  .user-prompt-input input {
+    width: 80%;
+    display: inline-block;
+    margin-right: 10px;
+    padding: 10px;
+  }
+  
+  .ai-response {
+    margin-top: 20px;
+    background-color: #e9f7ef;
+    padding: 10px;
+    border-left: 4px solid #28a745;
+    border-radius: 5px;
+  }
+  
+  /* Updates Section */
+  .updates-section h2 {
+    font-size: 22px;
+    margin-top: 30px;
+    color: #495057;
+  }
+  
+  .add-update input {
+    width: calc(100% - 120px);
+    display: inline-block;
+  }
+  
+  .add-button {
+    display: inline-block;
+    margin-left: 10px;
+  }
+  
+  .updates-list ul {
+    padding: 0;
+    list-style-type: none;
+  }
+  
+  .updates-list ul li {
+    margin-bottom: 10px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    border-left: 4px solid #17a2b8;
+  }
+  
+  /* Access Requests Section */
+  .access-requests h2 {
+    margin-top: 40px;
+    font-size: 22px;
+    color: #495057;
+  }
+  
+  .access-requests button {
+    margin-left: 10px;
+  }
+  
+  /* Admin Options */
+  .admin-options {
+    margin-top: 30px;
+  }
+  
+  .subtask-button, .complete-button {
+    margin-top: 10px;
+    margin-right: 10px;
+    background-color: #28a745;
+  }
+  
+  .task-status {
+    color: #28a745;
+    font-weight: bold;
+  }
+  
+  /* Responsive Layout */
+  @media screen and (max-width: 768px) {
+    .container {
+      padding: 15px;
+    }
+  
+    button, input[type="text"], input[type="date"], textarea, select {
+      font-size: 14px;
+    }
+  
+    .task-details h1 {
+      font-size: 20px;
+    }
+  }
+  

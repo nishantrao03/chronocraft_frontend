@@ -1,0 +1,59 @@
+.task-container {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .task {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+    width: 300px; /* Set a fixed width for the box */
+    height: 200px; /* Set a fixed height for the box */
+    overflow: hidden; /* Hide overflowing content */
+  }
+  
+  .title {
+    font-size: 18px;
+    font-weight: bold;
+    height: 20%; /* Set height relative to task box */
+    overflow: hidden; /* Hide overflowing content */
+    text-overflow: ellipsis; /* Display ellipsis for overflow */
+  }
+  
+  .deadline {
+    font-size: 12px;
+    color: #999;
+    text-align: right;
+  }
+  
+  .description {
+    height: 40%; /* Set max height relative to task box */
+    overflow: hidden; /* Hide overflowing content */
+    text-overflow: ellipsis; /* Display ellipsis for overflow */
+  }
+  
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+  .view-task,
+  .delete-task {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  
+  .view-task {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .delete-task {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  

@@ -1,0 +1,19 @@
+.add-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* Make the button circular */
+    background-color: #007bff; /* Background color for the button */
+    color: #fff; /* Text color */
+    font-size: 24px; /* Adjust font size */
+    border: none; /* Remove border */
+    cursor: pointer; /* Add cursor pointer */
+    outline: none; /* Remove outline */
+    display: flex; /* Enable flexbox layout */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+  }
+  
+  .plus-sign {
+    line-height: 1; /* Ensure the "+" sign is centered vertically */
+  }
+  
