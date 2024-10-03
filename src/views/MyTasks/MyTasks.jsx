@@ -16,7 +16,7 @@ function MyTasks() {
   useEffect(() => {
     if (userID) {
       // Fetch tasks after setting the user ID
-      axios.get(`http://localhost:5000/api/tasks/${userID}`, {
+      axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/${userID}`, {
         withCredentials: true, // Automatically send cookies with the request
         headers: {
           'Content-Type': 'application/json'
@@ -34,7 +34,7 @@ function MyTasks() {
   
 
   const handleDeleteTask = (taskID) => {
-    axios.delete(`http://localhost:5000/api/tasks/${taskID}`, {
+    axios.delete(`${process.env.REACT_APP_API_URL}/api/tasks/${taskID}`, {
       withCredentials: true, // Automatically send cookies with the request
       headers: {
         'Content-Type': 'application/json'

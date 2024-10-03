@@ -17,7 +17,7 @@ function TaskDetails({ show, onClose, task }) {
 
   const onUpdate = (editedTask) => {
     // Send PUT request to backend API endpoint with updated task data
-    axios.put(`http://localhost:5000/api/tasks/${editedTask._id}`, editedTask, {
+    axios.put(`${process.env.REACT_APP_API_URL}/api/tasks/${editedTask._id}`, editedTask, {
       withCredentials: true,  // Automatically send cookies with the request
       headers: {
         'Content-Type': 'application/json'

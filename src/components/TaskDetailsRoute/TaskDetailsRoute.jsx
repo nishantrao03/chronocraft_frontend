@@ -42,7 +42,7 @@ const [isEditing, setIsEditing] = useState(false);
         // Fetch task details and check access and requests
         const fetchTaskDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/tasks/${taskId}`, {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/tasks/${taskId}`, {
                     withCredentials: true,  // Automatically send cookies with the request
                     headers: {
                         'Content-Type': 'application/json'
@@ -91,7 +91,7 @@ const [isEditing, setIsEditing] = useState(false);
             };
     
             // Make the PUT request to update the task, including the cookies for authentication
-            await axios.put(`http://localhost:5000/api/tasks/${taskId}`, updatedTask, {
+            await axios.put(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}`, updatedTask, {
                 withCredentials: true,  // Automatically send cookies with the request
                 headers: {
                     'Content-Type': 'application/json'
@@ -122,7 +122,7 @@ const [isEditing, setIsEditing] = useState(false);
             console.log(userId,targetUserId);
             // Make the PUT request to the backend API to grant access
             const response = await axios.put(
-                `http://localhost:5000/tasks/${taskId}/grant-access`,
+                `${process.env.REACT_APP_API_URL}/tasks/${taskId}/grant-access`,
                 {
                     adminUserId: userId,  // Current user's ID (admin)
                     targetUserId: targetUserId  // The user who requested access
@@ -159,7 +159,7 @@ const [isEditing, setIsEditing] = useState(false);
     
             // POST request to the correct endpoint
             const response = await axios.post(
-                `http://localhost:5000/tasks/${taskId}/updates`,
+                `${process.env.REACT_APP_API_URL}/tasks/${taskId}/updates`,
                 newUpdateData,
                 {
                     withCredentials: true,
@@ -195,7 +195,7 @@ const [isEditing, setIsEditing] = useState(false);
     
             // PUT request to the correct endpoint
             const response = await axios.put(
-                `http://localhost:5000/tasks/${taskId}/updates/${editUpdateId}`,
+                `${process.env.REACT_APP_API_URL}/tasks/${taskId}/updates/${editUpdateId}`,
                 payload,
                 {
                     withCredentials: true,
@@ -230,7 +230,7 @@ const [isEditing, setIsEditing] = useState(false);
     
             // DELETE request to the correct endpoint
             const response = await axios.delete(
-                `http://localhost:5000/tasks/${taskId}/updates/${updateId}`,
+                `${process.env.REACT_APP_API_URL}/tasks/${taskId}/updates/${updateId}`,
                 {
                     data: payload, // DELETE requests can carry data this way
                     withCredentials: true,
@@ -254,7 +254,7 @@ const [isEditing, setIsEditing] = useState(false);
     const fetchAIResponse = async (prompt) => {
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/airesponse',
+                '${process.env.REACT_APP_API_URL}/api/airesponse',
                 { prompt },  // Send the prompt in the body
                 {
                     withCredentials: true,  // Automatically send cookies with the request if needed
@@ -279,7 +279,7 @@ const [isEditing, setIsEditing] = useState(false);
     //update task
     const handleUpdateTask = (editedTask) => {
         // Send PUT request to backend API endpoint with updated task data
-        axios.put(`http://localhost:5000/api/tasks/${editedTask._id}`, editedTask, {
+        axios.put(`${process.env.REACT_APP_API_URL}/api/tasks/${editedTask._id}`, editedTask, {
           withCredentials: true,  // Automatically send cookies with the request
           headers: {
             'Content-Type': 'application/json'

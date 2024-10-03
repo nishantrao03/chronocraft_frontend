@@ -32,7 +32,7 @@ function App() {
   
         try {
           // Step 1: Call the refresh token API
-          const response = await axios.post("http://localhost:5000/refresh-token", {}, { withCredentials: true });
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/refresh-token`, {}, { withCredentials: true });
   
           // Step 2: If the response is successful, set isAuthenticated to true
           if (response.status === 200) {

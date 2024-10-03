@@ -22,7 +22,7 @@ export default function Authenticate() {
     };
 
     const CreateUser = (uid) => {
-      axios.post('http://localhost:5000/api/auth', 
+      axios.post(`${process.env.REACT_APP_API_URL}/api/auth`, 
         { userID: uid },
         {
           headers: {

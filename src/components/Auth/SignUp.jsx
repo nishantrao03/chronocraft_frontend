@@ -27,7 +27,7 @@ const Signup = ({ DirectToLogin, CreateUser, setUserDetails }) => {
   
       // Step 3: Send Firebase token to the backend for JWT generation and HTTP-only cookie setup
       const response = await axios.post(
-        'http://localhost:5000/login', 
+        `${process.env.REACT_APP_API_URL}/login`, 
         { firebaseToken }, 
         { withCredentials: true, timeout: 40000 } // Ensure credentials are passed for cookie setup
       );
@@ -61,7 +61,7 @@ const Signup = ({ DirectToLogin, CreateUser, setUserDetails }) => {
       console.log("Firebase Token:", firebaseToken);
   
       // Step 3: Send Firebase Token to the Backend for JWT Generation and Cookie Setup
-      const response = await axios.post('http://localhost:5000/login', 
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, 
         { firebaseToken }, 
         {
           withCredentials: true, 
