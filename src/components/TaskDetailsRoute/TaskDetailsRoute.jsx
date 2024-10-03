@@ -254,7 +254,7 @@ const [isEditing, setIsEditing] = useState(false);
     const fetchAIResponse = async (prompt) => {
         try {
             const response = await axios.post(
-                '${process.env.REACT_APP_API_URL}/api/airesponse',
+                `${process.env.REACT_APP_API_URL}/api/airesponse`,
                 { prompt },  // Send the prompt in the body
                 {
                     withCredentials: true,  // Automatically send cookies with the request if needed
