@@ -135,35 +135,56 @@
     border-radius: 5px;
   }
   
-  /* Updates Section */
-  .updates-section h2 {
-    font-size: 22px;
-    margin-top: 30px;
-    color: #495057;
-  }
-  
-  .add-update input {
-    width: calc(100% - 120px);
-    display: inline-block;
-  }
-  
-  .add-button {
-    display: inline-block;
-    margin-left: 10px;
-  }
-  
-  .updates-list ul {
-    padding: 0;
-    list-style-type: none;
-  }
-  
-  .updates-list ul li {
-    margin-bottom: 10px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    border-left: 4px solid #17a2b8;
-  }
+/* Updates Section */
+.updates-section h2 {
+  font-size: 22px;
+  margin-top: 30px;
+  color: #495057;
+}
+
+.add-update {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.add-update input {
+  flex: 1;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  margin-right: 10px;
+}
+
+.add-button {
+  padding: 8px 15px;
+  font-size: 16px;
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-button:hover {
+  background-color: #138496;
+}
+
+.updates-list ul {
+  padding: 0;
+  list-style-type: none;
+}
+
+.updates-list ul li {
+  margin-bottom: 10px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  border-left: 4px solid #17a2b8;
+}
+
   
   /* Access Requests Section */
   .access-requests h2 {
@@ -185,6 +206,10 @@
     margin-top: 10px;
     margin-right: 10px;
     background-color: #28a745;
+  }
+
+  .incomplete-button {
+    background-color: #dc3545;
   }
   
   .task-status {

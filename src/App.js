@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setToken,setUserId } from "./redux/user/userSlice";
 import axios from "axios";
 import TaskDetails from "./components/TaskDetailsRoute/TaskDetailsRoute";
+import Loading from "./components/Loading/Loading";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -102,7 +103,7 @@ function App() {
 
   // Loading state handling
   if (isLoading) {
-    return <div>Loading...</div>; // Or a loading spinner
+    return <Loading />; // Or a loading spinner
   }
 
   // Render routes based on authentication status

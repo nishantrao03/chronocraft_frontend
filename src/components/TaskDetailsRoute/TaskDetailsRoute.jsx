@@ -4,12 +4,15 @@ import { useSelector } from 'react-redux';
 import axios from 'axios';
 import './TaskDetailsRoute.css';  // Import the CSS
 import AddTaskModal from '../AddTaskModal/AddTaskModal';
+import CompleteModal from '../CompleteModal/CompleteModal';
+import Loading from '../Loading/Loading';
 
 const TaskDetails = () => {
     const { taskId } = useParams();
     const userId = useSelector((state) => state.user.userId);
     //const userName = useSelector((state) => state.user.userName);  // Assuming you store the username in Redux
     const [task, setTask] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [isRequestingAccess, setIsRequestingAccess] = useState(false);
     const [hasAccess, setHasAccess] = useState(false); // Store if the user has access
@@ -26,6 +29,8 @@ const TaskDetails = () => {
 const [userPrompt, setUserPrompt] = useState('');
 const [aiResponse, setAIResponse] = useState('');
 const [isEditing, setIsEditing] = useState(false);
+const [isModalVisible, setModalVisible] = useState(false);
+    const [modalType, setModalType] = useState(''); // 'complete' or 'incomplete'
 
 
     // Handler to open modal
@@ -62,6 +67,13 @@ const [isEditing, setIsEditing] = useState(false);
                         setHasAccess(false);
                     }
 
+                    if(taskData.admins.includes(userId)){
+                        setIsAdmin(true);
+                    }
+                    // else{
+                    //     setIsAdmin(false);
+                    // }
+
                     // Check if the user has already requested access
                     const userHasRequested = taskData.requests.some(request => request.userID === userId);
                     setHasRequestedAccess(userHasRequested);
@@ -83,15 +95,11 @@ const [isEditing, setIsEditing] = useState(false);
     const handleRequestAccess = async () => {
         try {
             setIsRequestingAccess(true);
-    
-            // Update the requests field of the task by adding the current userId and userName
-            const updatedTask = { 
-                ...task, 
-                requests: [...task.requests, { userID: userId }] 
-            };
-    
-            // Make the PUT request to update the task, including the cookies for authentication
-            await axios.put(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}`, updatedTask, {
+            
+            // Make the POST request to request access for the task
+            await axios.post(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/request-access`, {
+                userID: userId // Sending only the userID to the backend
+            }, {
                 withCredentials: true,  // Automatically send cookies with the request
                 headers: {
                     'Content-Type': 'application/json'
@@ -99,14 +107,18 @@ const [isEditing, setIsEditing] = useState(false);
             });
     
             setIsRequestingAccess(false);
-    
-            // Optionally update the task in the frontend to reflect the changes
-            setTask(updatedTask);
             setHasRequestedAccess(true); // Mark that the user has requested access
-
+    
+            // Optionally, update the task state in the frontend if needed
+            const updatedTask = { 
+                ...task, 
+                requests: [...task.requests, { userID: userId }] // Update task's requests array in the frontend
+            };
+            setTask(updatedTask);
+    
             // Display success alert
             alert('Request for access has been sent successfully!');
-    
+        
         } catch (error) {
             console.error("Error requesting access", error);
             setIsRequestingAccess(false);
@@ -115,7 +127,7 @@ const [isEditing, setIsEditing] = useState(false);
             alert('Failed to send request. Please try again!');
         }
     };
-
+    
     const grantAccessToTask = async (targetUserId) => {
     
         try {
@@ -278,8 +290,14 @@ const [isEditing, setIsEditing] = useState(false);
 
     //update task
     const handleUpdateTask = (editedTask) => {
+
+        const payload = {
+            updatedTask: editedTask,
+            userId: userId,  // Include userId in the payload
+        };
+
         // Send PUT request to backend API endpoint with updated task data
-        axios.put(`${process.env.REACT_APP_API_URL}/api/tasks/${editedTask._id}`, editedTask, {
+        axios.put(`${process.env.REACT_APP_API_URL}/api/tasks/${editedTask._id}`, payload, {
           withCredentials: true,  // Automatically send cookies with the request
           headers: {
             'Content-Type': 'application/json'
@@ -296,14 +314,82 @@ const [isEditing, setIsEditing] = useState(false);
           // Handle error
         });
       };
+
+      const handleCompleteTask = (taskId) => {
+        axios.post(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, {}, {
+            withCredentials: true,  // Automatically send cookies with the request
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('Task marked complete successfully:', response.data.message);
+            // Update the task status to complete (you may want to fetch the updated task)
+            setTask(prevTask => ({ ...prevTask, status: 'finished' }));
+        })
+        .catch(error => {
+            console.error('Error marking task complete:', error);
+            // Handle error
+        });
+    };
     
+    const handleIncompleteTask = (taskId) => {
+        axios.post(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/incomplete`, {}, {
+            withCredentials: true,  // Automatically send cookies with the request
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('Task marked incomplete successfully:', response.data.message);
+            // Update the task status to pending (you may want to fetch the updated task)
+            setTask(prevTask => ({ ...prevTask, status: 'pending' }));
+        })
+        .catch(error => {
+            console.error('Error marking task incomplete:', error);
+            // Handle error
+        });
+    };
+    
+    const handleMarkComplete = () => {
+        if (task.completedSubTasks < task.subTasks.length) {
+            // Show error message
+            setModalType('error');
+            setModalVisible(true);
+        } else {
+            // Show confirmation modal
+            setModalType('complete');
+            setModalVisible(true);
+        }
+    };
+
+    const handleMarkIncomplete = () => {
+        // Show confirmation modal
+        setModalType('incomplete');
+        setModalVisible(true);
+    };
+
+    const handleModalConfirm = () => {
+        if (modalType === 'complete') {
+            // Call your complete task API function here
+            handleCompleteTask(task._id);
+        } else if (modalType === 'incomplete') {
+            // Call your incomplete task API function here
+            handleIncompleteTask(task._id);
+        }
+        setModalVisible(false); // Close the modal
+    };
+
+    const handleModalCancel = () => {
+        setModalVisible(false); // Close the modal
+    };
 
     if (errorMessage) {
         return <div className="error-message">{errorMessage}</div>;
     }
 
     if (!task) {
-        return <div className="loading">Loading...</div>;
+        return <Loading />;
     }
 
     // Render based on access
@@ -386,7 +472,7 @@ const [isEditing, setIsEditing] = useState(false);
         placeholder="Category"
       />
 
-      <label htmlFor="status">Status</label>
+      {/* <label htmlFor="status">Status</label>
       <select
         name="status"
         value={editedTask.status}
@@ -395,7 +481,7 @@ const [isEditing, setIsEditing] = useState(false);
       >
         <option value="pending">Pending</option>
         <option value="finished">Finished</option>
-      </select>
+      </select> */}
 
       <label htmlFor="priority">Priority</label>
       <select
@@ -436,7 +522,7 @@ const [isEditing, setIsEditing] = useState(false);
       <p><strong>Priority:</strong> {task.priority}</p>
       <p><strong>Assigned Users:</strong> {task.users.join(', ')}</p>
       
-      {task.admins.includes(userId) && (
+      {isAdmin && (
         <button
           onClick={() => setIsEditing(true)}
           className="edit-button"
@@ -510,22 +596,24 @@ const [isEditing, setIsEditing] = useState(false);
     {/* Updates Section */}
     <div className="updates-section">
         <h2>Updates</h2>
-        <div className="add-update">
-            <input
-                type="text"
-                value={newUpdate}
-                onChange={(e) => setNewUpdate(e.target.value)}
-                placeholder="Add a new update"
-            />
-            <button onClick={handleAddUpdate} className="add-button">Add Update</button>
-        </div>
+        {isAdmin && (
+    <div className="add-update">
+        <input
+            type="text"
+            value={newUpdate}
+            onChange={(e) => setNewUpdate(e.target.value)}
+            placeholder="Add a new update"
+        />
+        <button onClick={handleAddUpdate} className="add-button">+</button>
+    </div>
+)}
         <div className="updates-list">
             {task.updates.length > 0 ? (
                 <ul>
                     {task.updates.map((update) => (
                         <li key={update._id}>
                             <p><strong>Update:</strong> {update.update}</p>
-                            {task.admins.includes(userId) && (
+                            {isAdmin && (
                                 <>
                                     <div className="edit-options">
                                         <button
@@ -572,7 +660,7 @@ const [isEditing, setIsEditing] = useState(false);
     </div>
 
     {/* Access Requests Section (Visible to Admins Only) */}
-    {task.admins.includes(userId) && (
+    {isAdmin && (
         <div className="access-requests">
             <h2>Access Requests</h2>
             <ul>
@@ -595,25 +683,57 @@ const [isEditing, setIsEditing] = useState(false);
         </div>
     )}
 
-    {/* Options for Admin Users */}
-    {task.admins.includes(userId) && (
-        <div className="admin-options">
-            <h3>Admin Options</h3>
-            <button
-              onClick={handleNewSubTask}
-             className="subtask-button">
-                Add New Sub Task
-            </button>
-            <button
-            //  onClick={handleMarkComplete} 
-             className="complete-button">
-                Mark Task Complete
-            </button>
+<div>
+            {/* Options for Admin Users */}
+            {isAdmin && (
+                <div className="admin-options">
+                    <h3>Admin Options</h3>
+
+                    {/* Show button conditionally based on task status */}
+                    {task.status === 'pending' ? (
+                        <button
+                            onClick={handleMarkComplete}  // Trigger marking task as complete
+                            className="complete-button"
+                        >
+                            Mark Task Complete
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleMarkIncomplete}  // Trigger marking task as incomplete
+                            className="complete-button incomplete-button"
+                        >
+                            Mark Task Incomplete
+                        </button>
+                    )}
+
+                    <button
+                        onClick={handleNewSubTask}
+                        className="subtask-button"
+                    >
+                        Add New Sub Task
+                    </button>
+                </div>
+            )}
+
+            {/* Modal for Confirmation */}
+            <CompleteModal
+                show={isModalVisible}
+                title={modalType === 'error' ? 'Error' : 'Confirmation'}
+                modalType={modalType}
+                message={
+                    modalType === 'error'
+                        ? "Can't mark the task complete as there are incomplete sub tasks."
+                        : modalType === 'complete'
+                            ? "Are you sure you want to mark the task complete?"
+                            : "Are you sure you want to mark this task incomplete?"
+                }
+                onConfirm={handleModalConfirm}
+                onCancel={handleModalCancel}
+            />
         </div>
-    )}
 
     {/* Task Completion Status */}
-    {task.isCompleted && <p className="task-status">Task is marked as complete</p>}
+    {/* {task.isCompleted && <p className="task-status">Task is marked as complete</p>} */}
 
     {/* AddTaskModal Component for Sub-Task Creation */}
     <AddTaskModal 
