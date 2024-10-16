@@ -1,0 +1,31 @@
+/* AIHelp.module.css */
+.aiAssistance {
+    background-color: #f0f4f7;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.aiGeneratePromptButton, .aiCustomPromptButton {
+    background-color: #007bff;
+    margin-right: 10px;
+}
+
+.userPromptInput input {
+    width: 80%;
+    display: inline-block;
+    margin-right: 10px;
+    padding: 10px;
+}
+
+.sendPromptButton {
+    background-color: #28a745;
+}
+
+.aiResponse {
+    margin-top: 20px;
+    background-color: #e9f7ef;
+    padding: 10px;
+    border-left: 4px solid #28a745;
+    border-radius: 5px;
+}

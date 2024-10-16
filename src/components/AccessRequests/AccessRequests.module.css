@@ -1,0 +1,48 @@
+.access-requests h2 {
+  margin-top: 40px;
+  font-size: 22px;
+  color: #495057;
+}
+
+.access-requests ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.access-requests ul li {
+  margin-bottom: 10px;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  border-left: 4px solid #17a2b8;
+  display: flex;
+  align-items: center;
+}
+
+.grant-access-button {
+  background-color: #28a745;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.grant-access-button:hover {
+  background-color: #218838;
+}
+
+.deny-access-button {
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.deny-access-button:hover {
+  background-color: #c82333;
+}

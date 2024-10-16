@@ -11,7 +11,7 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
-  console.log(process.env.REACT_APP_API_URL);
+  //console.log(process.env.REACT_APP_API_URL);
 
   // const handleLogin = (e) => {
   //   e.preventDefault();

@@ -3,13 +3,20 @@ import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import './TaskDetailsRoute.css';  // Import the CSS
-import AddTaskModal from '../AddTaskModal/AddTaskModal';
-import CompleteModal from '../CompleteModal/CompleteModal';
-import Loading from '../Loading/Loading';
+import AddTaskModal from '../../components/AddTaskModal/AddTaskModal';
+import CompleteModal from '../../components/CompleteModal/CompleteModal';
+import Loading from '../../components/Loading/Loading';
+import TaskDetailsAndEdit from '../../components/TaskDetailsAndEdit/TaskDetailsAndEdit';
+import TaskHierarchy from '../../components/TaskHierarchy/TaskHierarchy';
+import AIHelp from '../../components/AIHelp/AIHelp';
+import UpdatesSection from '../../components/UpdatesSection/UpdatesSection';
+import AccessRequests from '../../components/AccessRequests/AccessRequests';
+import AdminOptions from '../../components/AdminOptions/AdminOptions';
 
 const TaskDetails = () => {
     const { taskId } = useParams();
     const userId = useSelector((state) => state.user.userId);
+    const [isLoading, setIsLoading] = useState(true);
     //const userName = useSelector((state) => state.user.userName);  // Assuming you store the username in Redux
     const [task, setTask] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -17,7 +24,7 @@ const TaskDetails = () => {
     const [isRequestingAccess, setIsRequestingAccess] = useState(false);
     const [hasAccess, setHasAccess] = useState(false); // Store if the user has access
     const [hasRequestedAccess, setHasRequestedAccess] = useState(false); // Track if the user has already requested access
-
+    const [editedTask, setEditedTask] = useState({});
     const [newUpdate, setNewUpdate] = useState("");
     const [editUpdateId, setEditUpdateId] = useState(null);
     const [editUpdateText, setEditUpdateText] = useState("");
@@ -43,54 +50,83 @@ const [isModalVisible, setModalVisible] = useState(false);
         setShowModal(false);
     };
 
+    // Function to extract and convert UTC to local time
+const getLocalTime = (deadline) => {
+    const date = new Date(deadline); // Convert deadline to Date object
+    return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); // Get local time in HH:mm format
+  };
+
     useEffect(() => {
         // Fetch task details and check access and requests
         const fetchTaskDetails = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/tasks/${taskId}`, {
-                    withCredentials: true,  // Automatically send cookies with the request
-                    headers: {
-                        'Content-Type': 'application/json'
+                const response = await axios.get(
+                    `${process.env.REACT_APP_API_URL}/tasks/${taskId}`,  // Task ID still in the URL
+                      // Pass userId in the body
+                    {
+                        params: { userId },
+                        withCredentials: true,  // Automatically send cookies with the request
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
                     }
-                });
+                );
+                
+                // If response is successful, handle the task data
                 const taskData = response.data;
     
+                // Check if the task data is valid
                 if (taskData) {
                     setTask(taskData);
-                    setEditedTask({...taskData});
-                    console.log(editedTask);
-
-                    // Check if the user is in the task's users list (has access)
-                    if (taskData.users.includes(userId)) {
-                        setHasAccess(true);
-                    } else {
-                        setHasAccess(false);
-                    }
-
-                    if(taskData.admins.includes(userId)){
+                    // Extract time from taskData.deadline
+                    //console.log(task);
+                    // const localTime = getLocalTime(editedTask.deadline); 
+                    // console.log(localTime);
+                    const temp={...taskData};
+                    // console.log(temp);
+                    setEditedTask(temp);
+                    //console.log(editedTask);
+                    //console.log(task.completedSubTasks);
+    
+                    // User has access if the task was successfully fetched
+                    setHasAccess(true);
+    
+                    if (taskData.admins.includes(userId)) {
                         setIsAdmin(true);
                     }
-                    // else{
-                    //     setIsAdmin(false);
-                    // }
-
+    
                     // Check if the user has already requested access
                     const userHasRequested = taskData.requests.some(request => request.userID === userId);
                     setHasRequestedAccess(userHasRequested);
                 } else {
                     setErrorMessage("Task not found");
+                    //setHasAccess(false);
                 }
+                //setIsLoading(false);
             } catch (error) {
-                console.error("Error fetching task details", error);
-                setErrorMessage("Task not found");
+                if (error.response && error.response.status === 404) {
+                    // Task not found
+                    setErrorMessage("Task not found");
+                } else if (error.response && error.response.status === 403) {
+                    // Access denied
+                    setHasAccess(false);
+                    setHasRequestedAccess(error.response.data.hasRequestedAccess);
+                } else {
+                    setErrorMessage("An error occurred while fetching the task.");
+                }
+                
+            }
+            finally{
+                setIsLoading(false);
             }
         };
     
         fetchTaskDetails();
     }, [taskId, userId]);
+    
 
-    const [editedTask, setEditedTask] = useState({ ...task });
-    console.log(editedTask);
+    
+    //console.log(editedTask);
 
     const handleRequestAccess = async () => {
         try {
@@ -110,11 +146,11 @@ const [isModalVisible, setModalVisible] = useState(false);
             setHasRequestedAccess(true); // Mark that the user has requested access
     
             // Optionally, update the task state in the frontend if needed
-            const updatedTask = { 
-                ...task, 
-                requests: [...task.requests, { userID: userId }] // Update task's requests array in the frontend
-            };
-            setTask(updatedTask);
+            // const updatedTask = { 
+            //     ...task, 
+            //     requests: [...task.requests, { userID: userId }] // Update task's requests array in the frontend
+            // };
+            // setTask(updatedTask);
     
             // Display success alert
             alert('Request for access has been sent successfully!');
@@ -291,10 +327,24 @@ const [isModalVisible, setModalVisible] = useState(false);
     //update task
     const handleUpdateTask = (editedTask) => {
 
+        // Combine date and time into one string
+        // Extract date and combine it with the time, converting to ISO format without causing errors
+if (editedTask.deadline && editedTask.time) {
+    // Split deadline to get only the date part (before 'T')
+    const datePart = editedTask.deadline.split('T')[0]; // Extracts the date (yyyy-mm-dd)
+    
+    // Combine datePart and time to form the correct ISO string
+    // No need to add 'Z' at the end, since 'Z' denotes UTC time
+    editedTask.deadline = `${datePart}T${editedTask.time}:00`;
+}
+
+
         const payload = {
             updatedTask: editedTask,
             userId: userId,  // Include userId in the payload
         };
+
+
 
         // Send PUT request to backend API endpoint with updated task data
         axios.put(`${process.env.REACT_APP_API_URL}/api/tasks/${editedTask._id}`, payload, {
@@ -316,7 +366,7 @@ const [isModalVisible, setModalVisible] = useState(false);
       };
 
       const handleCompleteTask = (taskId) => {
-        axios.post(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, {}, {
+        axios.post(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, {userId}, {
             withCredentials: true,  // Automatically send cookies with the request
             headers: {
                 'Content-Type': 'application/json'
@@ -334,7 +384,7 @@ const [isModalVisible, setModalVisible] = useState(false);
     };
     
     const handleIncompleteTask = (taskId) => {
-        axios.post(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/incomplete`, {}, {
+        axios.post(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/incomplete`, {userId}, {
             withCredentials: true,  // Automatically send cookies with the request
             headers: {
                 'Content-Type': 'application/json'
@@ -388,9 +438,45 @@ const [isModalVisible, setModalVisible] = useState(false);
         return <div className="error-message">{errorMessage}</div>;
     }
 
-    if (!task) {
+    if (isLoading) {
         return <Loading />;
     }
+
+    const breakdownTask = async () => {
+        try {
+            console.log("Requesting breakdown for task ID:", taskId);
+    
+            // Make the POST request to the backend API to breakdown the task
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/breakdown-task`, // API endpoint
+                {
+                    taskId: taskId,  // The ID of the task to break down
+                },
+                {
+                    withCredentials: true,  // Automatically send cookies with the request
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+    
+            // Handle success response
+            //alert('Task breakdown successful');  // Example: 'Task breakdown successful'
+            setAIResponse(response.data.breakdown);
+            console.log('AI Breakdown:', response.data.breakdown); // Log the breakdown details
+    
+            // Here you can update your UI or state with the breakdown result if needed
+    
+        } catch (error) {
+            // Handle any error that occurs during the request
+            if (error.response && error.response.data.message) {
+                alert(`Error: ${error.response.data.message}`);
+            } else {
+                console.error('Server error', error);
+                alert('Server error, please try again later.');
+            }
+        }
+    };
 
     // Render based on access
     if (!hasAccess) {
@@ -419,318 +505,110 @@ const [isModalVisible, setModalVisible] = useState(false);
         setEditedTask({ ...editedTask, [name]: value });
       };
 
+      const denyAccessToTask = async (targetUserId) => {
+        try {
+            console.log(userId, targetUserId);
+            // Make the PUT request to the backend API to deny access
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_URL}/tasks/${taskId}/deny-access`,
+                {
+                    adminUserId: userId,  // Current user's ID (admin)
+                    targetUserId: targetUserId  // The user who requested access
+                },
+                {
+                    withCredentials: true,  // Automatically send cookies with the request
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+    
+            // Handle success response
+            alert(response.data.message);  // Example: 'Access request denied successfully'
+    
+        } catch (error) {
+            // Handle any error that occurs during the request
+            if (error.response && error.response.data.message) {
+                alert(`Error: ${error.response.data.message}`);
+            } else {
+                console.error('Server error', error);
+                alert('Server error, please try again later.');
+            }
+        }
+    };
+    
+
     // Render task details if the user has access
     return (
         <div className="container">
     {/* Task Basic Details */}
-    <div className="task-details">
-  <h1>Task Details</h1>
-  {isEditing ? (
-    <div>
-      <label htmlFor="title">Task Name</label>
-      <input
-        type="text"
-        name="title"
-        value={editedTask.title}
-        onChange={handleChange}
-        placeholder="Task Name"
-        required
+    
+      <TaskDetailsAndEdit
+        isEditing={isEditing}
+        editedTask={editedTask}
+        handleChange={handleChange}
+        handleUpdateTask={handleUpdateTask}
+        setIsEditing={setIsEditing}
+        task={task}
+        isAdmin={isAdmin}
       />
-      
-      <label htmlFor="description">Description</label>
-      <textarea
-        name="description"
-        value={editedTask.description}
-        onChange={handleChange}
-        required
-      />
-
-      <label htmlFor="deadline">Deadline</label>
-      <input
-        type="date"
-        name="deadline"
-        value={editedTask.deadline}
-        onChange={handleChange}
-        required
-      />
-
-      <label htmlFor="resources">Resources</label>
-      <input
-        type="text"
-        name="resources"
-        value={editedTask.resources}
-        onChange={handleChange}
-        placeholder="Resources"
-      />
-
-      <label htmlFor="category">Category</label>
-      <input
-        type="text"
-        name="category"
-        value={editedTask.category}
-        onChange={handleChange}
-        placeholder="Category"
-      />
-
-      {/* <label htmlFor="status">Status</label>
-      <select
-        name="status"
-        value={editedTask.status}
-        onChange={handleChange}
-        required
-      >
-        <option value="pending">Pending</option>
-        <option value="finished">Finished</option>
-      </select> */}
-
-      <label htmlFor="priority">Priority</label>
-      <select
-        name="priority"
-        value={editedTask.priority}
-        onChange={handleChange}
-        required
-      >
-        <option value="normal">Normal</option>
-        <option value="high">High</option>
-      </select>
-    <div>
-        <br />
-    <button
-        onClick={() => handleUpdateTask(editedTask)}
-        className="update-button"
-      >
-        Update Task
-      </button>
-
-      <button
-        onClick={() => setIsEditing(false)}
-        className="cancel-button"
-      >
-        Cancel
-      </button>
-    </div>
-      
-    </div>
-  ) : (
-    <>
-      <p><strong>Task Name:</strong> {task.title}</p>
-      <p><strong>Description:</strong> {task.description}</p>
-      <p><strong>Due Date:</strong> {task.deadline}</p>
-      <p><strong>Resources:</strong> {task.resources}</p>
-      <p><strong>Category:</strong> {task.category}</p>
-      <p><strong>Status:</strong> {task.status}</p>
-      <p><strong>Priority:</strong> {task.priority}</p>
-      <p><strong>Assigned Users:</strong> {task.users.join(', ')}</p>
-      
-      {isAdmin && (
-        <button
-          onClick={() => setIsEditing(true)}
-          className="edit-button"
-        >
-          Edit Task
-        </button>
-      )}
-    </>
-  )}
-</div>
+    
 
 
     {/* Parent and Child Tasks */}
-    <div className="task-links">
-        {task.parentTaskId && (
-            <p>
-                <strong>Parent Task:</strong>
-                <a href={`/task/${task.parentTaskId}`}>{task.parentTaskId}</a>
-            </p>
-        )}
-        {task.subTasks && task.subTasks.length > 0 && (
-            <div>
-                <h3>Sub-Tasks:</h3>
-                <ul>
-                    {task.subTasks.map((subTask) => (
-                        <li key={subTask}>
-                            <a href={`/task/${subTask}`}>{subTask}</a>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        )}
-    </div>
+    
+            {/* Other components or content */}
+            
+            {/* Parent and Child Tasks */}
+            <TaskHierarchy 
+                parentTaskId={task.parentTaskId} 
+                subTasks={task.subTasks} 
+            />
+        
 
     {/* AI Help for Sub-Tasks */}
     {/* AI Assistance for Sub-task Generation */}
-<div className="ai-assistance">
-    <p>Having trouble breaking your task into sub-tasks? Here's an AI tool to help generate sub-tasks for you:</p>
-    <button onClick={() => fetchAIResponse(task.description)} className="ai-generate-prompt-button">
-        Generate Sub-Tasks with AI
-    </button>
-    <button onClick={() => setShowUserPrompt(true)} className="ai-custom-prompt-button">
-        Provide Your Own Prompt
-    </button>
-
-    {/* Show user prompt input if the user clicks the custom prompt button */}
-    {showUserPrompt && (
-        <div className="user-prompt-input">
-            <input 
-                type="text" 
-                value={userPrompt} 
-                onChange={(e) => setUserPrompt(e.target.value)} 
-                placeholder="Enter your custom prompt here"
-            />
-            <button onClick={() => fetchAIResponse(userPrompt)} className="send-prompt-button">
-                Send Custom Prompt
-            </button>
-        </div>
-    )}
-
-    {/* Display the AI response (if available) */}
-    {aiResponse && (
-        <div className="ai-response">
-            <h4>AI Generated Response:</h4>
-            <p>{aiResponse}</p>
-        </div>
-    )}
-</div>
+    <AIHelp task={task} fetchAIResponse={fetchAIResponse} aiResponse={aiResponse} breakdownTask={breakdownTask} />
 
 
+    {/* {task.completedSubTasks} */}
     {/* Updates Section */}
-    <div className="updates-section">
-        <h2>Updates</h2>
-        {isAdmin && (
-    <div className="add-update">
-        <input
-            type="text"
-            value={newUpdate}
-            onChange={(e) => setNewUpdate(e.target.value)}
-            placeholder="Add a new update"
-        />
-        <button onClick={handleAddUpdate} className="add-button">+</button>
-    </div>
-)}
-        <div className="updates-list">
-            {task.updates.length > 0 ? (
-                <ul>
-                    {task.updates.map((update) => (
-                        <li key={update._id}>
-                            <p><strong>Update:</strong> {update.update}</p>
-                            {isAdmin && (
-                                <>
-                                    <div className="edit-options">
-                                        <button
-                                            onClick={() => { 
-                                                setEditUpdateId(update._id); 
-                                                setEditUpdateText(update.update); 
-                                            }}
-                                            className="edit-button"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteUpdate(update._id)}
-                                            className="delete-button"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                    {editUpdateId === update._id && (
-                                        <div className="edit-update">
-                                            <input
-                                                type="text"
-                                                value={editUpdateText}
-                                                onChange={(e) => setEditUpdateText(e.target.value)}
-                                                placeholder="Edit update"
-                                            />
-                                            <button onClick={handleEditUpdate} className="save-button">
-                                                Save Changes
-                                            </button>
-                                            <button onClick={() => setEditUpdateId(null)} className="cancel-button">
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p>No updates available.</p>
-            )}
-        </div>
-    </div>
+    <UpdatesSection
+  isAdmin={isAdmin}
+  newUpdate={newUpdate}
+  setNewUpdate={setNewUpdate}
+  handleAddUpdate={handleAddUpdate}
+  task={task}
+  editUpdateId={editUpdateId}
+  setEditUpdateId={setEditUpdateId}
+  editUpdateText={editUpdateText}
+  setEditUpdateText={setEditUpdateText}
+  handleEditUpdate={handleEditUpdate}
+  handleDeleteUpdate={handleDeleteUpdate}
+/>
+
 
     {/* Access Requests Section (Visible to Admins Only) */}
-    {isAdmin && (
-        <div className="access-requests">
-            <h2>Access Requests</h2>
-            <ul>
-                {task.requests.length > 0 ? (
-                    task.requests.map((request, index) => (
-                        <li key={index}>
-                            {request.userID}
-                            <button 
-                                onClick={() => grantAccessToTask(request.userID)} 
-                                className="grant-access-button"
-                            >
-                                Grant Access
-                            </button>
-                        </li>
-                    ))
-                ) : (
-                    <p>No access requests found.</p>
-                )}
-            </ul>
-        </div>
-    )}
+    <AccessRequests 
+  isAdmin={isAdmin} 
+  task={task} 
+  grantAccessToTask={grantAccessToTask} 
+  denyAccessToTask={denyAccessToTask} 
+/>
 
-<div>
-            {/* Options for Admin Users */}
-            {isAdmin && (
-                <div className="admin-options">
-                    <h3>Admin Options</h3>
 
-                    {/* Show button conditionally based on task status */}
-                    {task.status === 'pending' ? (
-                        <button
-                            onClick={handleMarkComplete}  // Trigger marking task as complete
-                            className="complete-button"
-                        >
-                            Mark Task Complete
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleMarkIncomplete}  // Trigger marking task as incomplete
-                            className="complete-button incomplete-button"
-                        >
-                            Mark Task Incomplete
-                        </button>
-                    )}
+<AdminOptions
+  isAdmin={isAdmin}
+  task={task}
+  handleMarkComplete={handleMarkComplete}
+  handleMarkIncomplete={handleMarkIncomplete}
+  handleNewSubTask={handleNewSubTask}
+  isModalVisible={isModalVisible}
+  modalType={modalType}
+  handleModalConfirm={handleModalConfirm}
+  handleModalCancel={handleModalCancel}
+/>
 
-                    <button
-                        onClick={handleNewSubTask}
-                        className="subtask-button"
-                    >
-                        Add New Sub Task
-                    </button>
-                </div>
-            )}
-
-            {/* Modal for Confirmation */}
-            <CompleteModal
-                show={isModalVisible}
-                title={modalType === 'error' ? 'Error' : 'Confirmation'}
-                modalType={modalType}
-                message={
-                    modalType === 'error'
-                        ? "Can't mark the task complete as there are incomplete sub tasks."
-                        : modalType === 'complete'
-                            ? "Are you sure you want to mark the task complete?"
-                            : "Are you sure you want to mark this task incomplete?"
-                }
-                onConfirm={handleModalConfirm}
-                onCancel={handleModalCancel}
-            />
-        </div>
 
     {/* Task Completion Status */}
     {/* {task.isCompleted && <p className="task-status">Task is marked as complete</p>} */}
@@ -740,6 +618,8 @@ const [isModalVisible, setModalVisible] = useState(false);
                 show={showModal} 
                 handleClose={handleCloseModal} 
                 parentTaskId={task._id}  // Pass parent task ID
+                handleIncompleteTask={handleIncompleteTask}
+                status={task.status}
             />
 </div>
 

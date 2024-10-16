@@ -7,7 +7,7 @@ import MyTasks from "./views/MyTasks/MyTasks";
 import { useSelector, useDispatch } from "react-redux";
 import { setToken,setUserId } from "./redux/user/userSlice";
 import axios from "axios";
-import TaskDetails from "./components/TaskDetailsRoute/TaskDetailsRoute";
+import TaskDetails from "./views/TaskDetailsRoute/TaskDetailsRoute";
 import Loading from "./components/Loading/Loading";
 
 function App() {

@@ -1,0 +1,22 @@
+/* TaskHierarchy.module.css */
+.taskLinks {
+    margin: 15px 0;
+}
+
+.taskLinks h3 {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.taskLinks ul {
+    padding-left: 20px;
+}
+
+.taskLinks a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.taskLinks a:hover {
+    text-decoration: underline;
+}

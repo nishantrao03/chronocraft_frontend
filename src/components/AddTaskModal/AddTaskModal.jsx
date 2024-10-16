@@ -3,7 +3,7 @@ import './AddTaskModal.css'; // Import CSS file for styling
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 
-function AddTaskModal({ show, handleClose, parentTaskId }) {
+function AddTaskModal({ show, handleClose, parentTaskId, handleIncompleteTask, status }) {
     const uid = useSelector((state) => state.user.userId);  // Fetch the userID from Redux
     const token = useSelector((state) => state.user.token);  // Fetch the token from Redux
 
@@ -12,6 +12,7 @@ function AddTaskModal({ show, handleClose, parentTaskId }) {
         title: '',
         description: '',
         deadline: '',
+        time: '',
         resources: '',
         category: '',
         priority: 'normal',
@@ -31,6 +32,9 @@ function AddTaskModal({ show, handleClose, parentTaskId }) {
         if (parentTaskId) {
             formData.parentTaskId = parentTaskId;  // Add the parentTaskId if it's provided
         }
+
+        // Combine date and time into one string
+        formData.deadline = `${formData.deadline}T${formData.time}`; // ISO format
         
         axios.post(`${process.env.REACT_APP_API_URL}/api/tasks`, formData, {
           withCredentials: true,  // Automatically send cookies with the request
@@ -40,6 +44,10 @@ function AddTaskModal({ show, handleClose, parentTaskId }) {
         })
         .then(response => {
           console.log('Task created successfully:', response.data);
+          
+          if(parentTaskId&&status==='finished'){
+            handleIncompleteTask(parentTaskId);
+          }
           handleClose();  // Close the modal after successful creation
         })
         .catch(error => {
@@ -96,6 +104,17 @@ function AddTaskModal({ show, handleClose, parentTaskId }) {
                                     className="form-control"
                                     name="deadline"
                                     value={formData.deadline}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Time</label>
+                                <input
+                                    type="time"
+                                    className="form-control"
+                                    name="time"
+                                    value={formData.time}
                                     onChange={handleChange}
                                     required
                                 />
