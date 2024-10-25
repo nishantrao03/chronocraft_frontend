@@ -138,7 +138,7 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
         { firebaseToken }, 
         {
           withCredentials: true, 
-          timeout: 40000 // Timeout of 40 seconds (40,000 milliseconds)
+          timeout: 80000 // Timeout of 40 seconds (40,000 milliseconds)
         }
       );
       console.log(response);

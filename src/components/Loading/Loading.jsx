@@ -1,13 +1,23 @@
 // Loading.js
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import styles from "./Loading.module.css";
-import { useEffect } from "react";
-import axios from "axios"; // Import the CSS module
+
+const quotes = [
+  "If a task can be accomplished in under a minute, initiate it immediately.",
+  "Delegate effectively, elevate productivity.",
+  "Plan your work, work your plan.",
+  "Efficiency is doing things right, effectiveness is doing the right things.",
+  "Organization is the backbone of productivity.",
+  "Collaborate, innovate, elevate.",
+  "You are one task closer to your dreams."
+];
 
 const Loading = () => {
+  const [quote, setQuote] = useState("");
 
   useEffect(() => {
-    // Function to make an API call to the backend
+    // Wake up the backend
     const wakeBackend = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/healthcheck`);
@@ -17,17 +27,19 @@ const Loading = () => {
       }
     };
 
-    // Call the function to wake up the backend
     wakeBackend();
-  }, []); // Empty dependency array ensures this runs only once when the component is mounted
+
+    // Set a random motivational quote
+    let index=Math.floor(Math.random() * quotes.length);
+    console.log(index);
+    setQuote(quotes[index]);
+  }, []);
 
   return (
     <div className={styles.loadingContainer}>
-      {/* <div className={styles.logoContainer}>
-        <img src="/logo.svg" alt="Logo" className={styles.loadingLogo} />
-      </div> */}
       <div className={styles.spinner}></div>
-      <p className={styles.loadingText}>Loading, please wait...</p>
+      <p className={styles.loadingText}>Loading, please wait... This might take up a minute or two.</p>
+      <p className={styles.quote}>{quote}</p>
     </div>
   );
 };
