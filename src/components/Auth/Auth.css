@@ -1,82 +1,104 @@
 /* Login Page Styles */
 .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f0f2f5;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100vh;
+  padding-left: 0%;
+  background: linear-gradient(135deg, #000000, #0a0f3c);
+  color: #ffffff;
+  font-family: 'Arial', sans-serif;
+  animation: fadeIn 1s ease-in;
+}
+
+.login-content {
+  text-align: left;
+  padding-left: 40px;
+}
+
+.login-heading {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.login-description {
+  font-size: 18px;
+  margin-bottom: 25px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-input {
+  padding: 12px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  border: 1px solid #666;
+  border-radius: 5px;
+  background-color: #1e1e30;
+  color: #ffffff;
+  width: 250px;
+}
+
+.login-button,
+.google-btn {
+  padding: 12px;
+  font-size: 18px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 250px;
+}
+
+.login-button {
+  background-color: #1877f2;
+}
+
+.google-btn {
+  background-color: #db4437;
+}
+
+.login-button:hover {
+  background-color: #166fe5;
+}
+
+.google-btn:hover {
+  background-color: #c33427;
+}
+
+.signup-link a {
+  color: #66ccff;
+  text-decoration: none;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive styles for mobile devices */
+@media (max-width: 768px) {
+  .login-content {
+    padding-left: 20px;
+    padding-right: 20px; /* Adjusts right padding for mobile view */
   }
-  
-  .login-box {
-    background-color: #fff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
-    width: 400px;
-    text-align: center;
-  }
-  
-  .login-box h2 {
-    margin-bottom: 30px;
-    font-size: 28px;
-    color: #333;
-  }
-  
-  .login-box form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .login-box input {
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .login-box button {
-    padding: 12px;
-    font-size: 18px;
-    border: none;
-    background-color: #1877f2;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .login-box button:hover {
-    background-color: #166fe5;
-  }
-  
+
+  .login-input,
+  .login-button,
   .google-btn {
-    margin-top: 20px;
-    padding: 12px;
-    font-size: 16px;
-    background-color: #db4437;
-    color: white;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
+    width: 100%; /* Full width on mobile devices */
+    box-sizing: border-box; /* Ensures padding is accounted for in width */
+    padding-right: 10px; /* Adds right padding to improve alignment */
   }
-  
-  .google-btn:hover {
-    background-color: #c33427;
+
+  .login-heading {
+    font-size: 24px; /* Smaller heading on mobile */
   }
-  
-  .signup-link {
-    margin-top: 20px;
-    color: #1877f2;
+
+  .login-description {
+    font-size: 16px; /* Smaller description font */
   }
-  
-  .signup-link a {
-    color: #1877f2;
-    text-decoration: none;
-  }
-  
-  .signup-link a:hover {
-    text-decoration: underline;
-  }
-  
+}

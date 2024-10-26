@@ -104,15 +104,17 @@ const Signup = ({ DirectToLogin, CreateUser, setUserDetails }) => {
   // );
   return (
     <div className="login-container">
-      <div className="login-box">
-        <h2>Signup</h2>
-        <form onSubmit={handleSignup}>
+      <div className="login-content">
+        <h2 className="login-heading">Welcome to ChronoCraft</h2>
+        <p className="login-description">Create an account to get started with task management and seamless collaboration.</p>
+        <form className="login-form" onSubmit={handleSignup}>
           <input 
             type="email" 
             placeholder="Email" 
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
             required 
+            className="login-input"
           />
           <input 
             type="password" 
@@ -120,8 +122,9 @@ const Signup = ({ DirectToLogin, CreateUser, setUserDetails }) => {
             value={password} 
             onChange={(e) => setPassword(e.target.value)} 
             required 
+            className="login-input"
           />
-          <button type="submit">Signup</button>
+          <button type="submit" className="login-button">Signup</button>
         </form>
         <button className="google-btn" onClick={googleLogin}>Sign In with Google</button>
         <p className="signup-link">
