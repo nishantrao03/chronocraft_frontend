@@ -17,7 +17,7 @@
 }
 
 .login-heading {
-  font-size: 32px;
+  font-size: 44px;
   font-weight: bold;
   margin-bottom: 20px;
 }
@@ -95,7 +95,7 @@
   }
 
   .login-heading {
-    font-size: 24px; /* Smaller heading on mobile */
+    font-size: 26px; /* Smaller heading on mobile */
   }
 
   .login-description {
