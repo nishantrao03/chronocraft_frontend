@@ -32,14 +32,19 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
     const googleProvider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, googleProvider);
+      console.log("Debug 1");
       const firebaseToken = await result.user.getIdToken();
+      console.log("Debug 2");
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/login`,
         { firebaseToken },
         { withCredentials: true, timeout: 80000 }
       );
+      console.log("Debug 3");
       const userId = result.user.uid;
+      console.log("Debug 4");
       dispatch(setUserId(userId));
+      console.log("Debug 5");
       await CreateUser(userId);
     } catch (error) {
       console.error('Google login error:', error);
