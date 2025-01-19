@@ -39,7 +39,7 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
       const firebaseToken = await result.user.getIdToken();
       console.log("Debug 2");
       const response = await axios.post(
-        `https://chronocraft-backend.vercel.app/login`,
+        `${apiurl}/login`,
         { firebaseToken },
         { withCredentials: true, timeout: 80000 }
       );
