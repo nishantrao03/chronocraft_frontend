@@ -11,6 +11,8 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   console.log(process.env.REACT_APP_API_URL)
+  const apiurl=process.env.REACT_APP_API_URL;
+  console.log(apiurl);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -37,7 +39,7 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
       const firebaseToken = await result.user.getIdToken();
       console.log("Debug 2");
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/login`,
+        `${apiurl}/login`,
         { firebaseToken },
         { withCredentials: true, timeout: 80000 }
       );
