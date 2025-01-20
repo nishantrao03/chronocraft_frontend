@@ -39,7 +39,7 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
       const firebaseToken = await result.user.getIdToken();
       console.log("Debug 2");
       const response = await axios.post(
-        `${apiurl}/login`,
+        `${process.env.REACT_APP_API_URL}/login`,
         { firebaseToken },
         { withCredentials: true, timeout: 80000 }
       );
