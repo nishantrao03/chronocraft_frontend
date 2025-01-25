@@ -10,12 +10,14 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   console.log(process.env.REACT_APP_API_URL)
   const apiurl=process.env.REACT_APP_API_URL;
   console.log(apiurl);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const firebaseToken = await userCredential.user.getIdToken();
@@ -28,10 +30,13 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
       dispatch(setUserId(userId));
     } catch (error) {
       console.error('Login error:', error);
+    } finally{
+      setLoading(false);
     }
   };
 
   const googleLogin = async () => {
+    setLoading(true);
     const googleProvider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, googleProvider);
@@ -51,11 +56,18 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
       await CreateUser(userId);
     } catch (error) {
       console.error('Google login error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="login-container">
+      {loading && (
+        <div className="loading-overlay">
+          <div className="spinner"></div>
+        </div>
+      )}
       <div className="login-content">
         <h2 className="login-heading">Welcome to ChronoCraft</h2>
         <p className="login-description">Log in to get started with task management and seamless collaboration.</p>
