@@ -10,10 +10,10 @@ const Signup = ({ DirectToLogin, CreateUser, setUserDetails }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
-
+  const [loading, setLoading] = useState(false);
   const handleSignup = async (e) => {
     e.preventDefault();
-  
+    setLoading(true);
     try {
       // Step 1: Create user with email and password using Firebase
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -45,17 +45,21 @@ const Signup = ({ DirectToLogin, CreateUser, setUserDetails }) => {
       
     } catch (error) {
       console.error('Error during sign-up:', error);
+    } finally{
+      setLoading(false);
     }
   };
   
   
 
   const googleLogin = async () => {
+    
     const googleProvider = new GoogleAuthProvider();
+    
     try {
       // Step 1: Firebase Google Sign-In
       const result = await signInWithPopup(auth, googleProvider);
-      
+      setLoading(true);
       // Step 2: Get the Firebase ID token (Access Token)
       const firebaseToken = await result.user.getIdToken();
       console.log("Firebase Token:", firebaseToken);
@@ -79,6 +83,8 @@ const Signup = ({ DirectToLogin, CreateUser, setUserDetails }) => {
       
     } catch (error) {
       console.error('Google login error:', error);
+    } finally{
+      setLoading(false);
     }
   };
 
@@ -104,6 +110,11 @@ const Signup = ({ DirectToLogin, CreateUser, setUserDetails }) => {
   // );
   return (
     <div className="login-container">
+      {loading && (
+        <div className="loading-overlay">
+          <div className="spinner"></div>
+        </div>
+      )}
       <div className="login-content">
         <h2 className="login-heading">Welcome to ChronoCraft</h2>
         <p className="login-description">Create an account to get started with task management and seamless collaboration.</p>

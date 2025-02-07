@@ -36,10 +36,12 @@ const Login = ({ DirectToSignUp, CreateUser }) => {
   };
 
   const googleLogin = async () => {
-    setLoading(true);
+    
     const googleProvider = new GoogleAuthProvider();
+    
     try {
       const result = await signInWithPopup(auth, googleProvider);
+      setLoading(true);
       console.log("Debug 1");
       const firebaseToken = await result.user.getIdToken();
       console.log("Debug 2");
